@@ -16,6 +16,7 @@
 
 'use strict';
 
+// TODO put in env var, generate new token
 const PAGE_ACCESS_TOKEN = 'EAAFXEQpTodABACvOXu0IuQ3S0pRtfB2hsEmWWaqt0i6sZAmdbablQyfZCswYVenyB7wsovax8oFWBZB0ZBX0vmCGYwe4lXQfr2GBUMcmiYg4JSMPRx72gwtOjHeeuNk0oNZBM5oS5AVUCKpJ2K0084RcjfDrXOokMzRlCDTXyHQZDZD';
 
 function callSendAPI(sender_psid, response) {
@@ -39,7 +40,7 @@ function callSendAPI(sender_psid, response) {
     } else {
       console.error("Unable to send message:" + err);
     }
-  }); 
+  });
 }
 
 function handleMessage(sender_psid, received_message) {
@@ -58,22 +59,32 @@ function handleMessage(sender_psid, received_message) {
     response = {
       "text": output,
       "quick_replies": [
-           {
-                  'content_type': 'text',
-                  'title': 'list',
-		  'payload': 'ls',
-	    },
-	    {
-		'content_type': 'text',
-		'title': 'help',
-		'payload': '--help',
-	    }
+        {
+          'content_type': 'text',
+          'title': 'add',
+          'payload': 'add',
+        },
+        {
+          'content_type': 'text',
+          'title': 'remove',
+          'payload': 'rm',
+        },
+        {
+          'content_type': 'text',
+          'title': 'list',
+	        'payload': 'ls',
+	      },
+	      {
+      		'content_type': 'text',
+      		'title': 'help',
+      		'payload': '--help',
+	      }
       ]
     }
-  
+
 
   // Sends the response message
-  callSendAPI(sender_psid, response);    
+  callSendAPI(sender_psid, response);
 }
 
 // Imports dependencies and set up http server
@@ -106,7 +117,6 @@ app.post('/webhook', (req, res) => {
 
 
       let sender_psid = webhook_event.sender.id;
-      console.log('Sender PSID: ' + sender_psid);
 
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
@@ -155,4 +165,3 @@ app.get('/webhook', (req, res) => {
     }
   }
 });
-
