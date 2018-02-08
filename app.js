@@ -43,43 +43,52 @@ function callSendAPI(sender_psid, response) {
   });
 }
 
+function quick_replyify(label_command_pairs) {
+  let quick_replies = []
+  label_command_pairs.forEach((pair) => {
+    quick_replies.push({
+      'content_type': 'text',
+      'title': pair[0],
+      'payload': pair[1],
+    })
+  })
+  return quick_replies
+}
+
+const datum_commands = [
+  ['add', 'add'],
+  ['remove', 'rm'],
+  ['list', 'ls'],
+  ['help', '--help'],
+]
+
 function handleMessage(sender_psid, received_message) {
 
-  let response, output;
+  let response, output, quick_replies;
 
   // Check if the message contains text
-  if (received_message.quick_reply) {
+  if (received_message.quick_reply && received_message.quick_reply.payload === 'add') {
+    let datum = spawnSync('datum', ['ls', 'tags'])
+    output = datum.stdout.toString().split('\n')
+    quick_replies = []
+    output.forEach((tag) => {
+      quick_replies.push([tag, tag])
+    })
+    console.log(output)
+  } else if (received_message.quick_reply) {
     let datum = spawnSync('datum', [received_message.quick_reply.payload])
     output = datum.stdout.toString()
+    quick_replies = quick_replyify(datum_commands)
   } else {
     output = 'hey there!'
+    quick_replies = quick_replyify(datum_commands)
   }
+
 
     // Create the payload for a basic text message
     response = {
       "text": output,
-      "quick_replies": [
-        {
-          'content_type': 'text',
-          'title': 'add',
-          'payload': 'add',
-        },
-        {
-          'content_type': 'text',
-          'title': 'remove',
-          'payload': 'rm',
-        },
-        {
-          'content_type': 'text',
-          'title': 'list',
-	        'payload': 'ls',
-	      },
-	      {
-      		'content_type': 'text',
-      		'title': 'help',
-      		'payload': '--help',
-	      }
-      ]
+      "quick_replies": quick_replies,
     }
 
 
