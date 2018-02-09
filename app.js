@@ -70,11 +70,13 @@ function handleMessage(sender_psid, received_message) {
   if (received_message.quick_reply && received_message.quick_reply.payload === 'add') {
     let datum = spawnSync('datum', ['ls', 'tags'])
     output = datum.stdout.toString().split('\n')
-    quick_replies = []
+    output.pop()
+    let pairs = []
     output.forEach((tag) => {
-      quick_replies.push([tag, tag])
+      pairs.push([tag, tag])
     })
-    console.log(output)
+    quick_replies = quick_replyify(pairs)
+    output = 'Input tag:'
   } else if (received_message.quick_reply) {
     let datum = spawnSync('datum', [received_message.quick_reply.payload])
     output = datum.stdout.toString()
