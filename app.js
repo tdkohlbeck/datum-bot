@@ -48,8 +48,10 @@ function get_tag_quick_replies(list_only = false) {
   if (list_only) {
     return output
   }
-  output.split('\n').pop() // remove newline at the end
+  output = output.split('\n')
+  output.pop() // remove newline at the end
   let pairs = []
+  console.log('output:', output)
   output.forEach((tag) => {
     pairs.push([tag, tag])
   })
