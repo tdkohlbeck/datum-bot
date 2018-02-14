@@ -62,40 +62,55 @@ const datum_commands = [
   ['help', '--help'],
 ]
 
+function get_tag_quick_replies() {
+  let datum = spawnSync('datum', ['ls', 'tags'])
+  let output = datum.stdout.toString().split('\n')
+  output.pop() // remove newline at the end
+  let pairs = []
+  output.forEach((tag) => {
+    pairs.push([tag, tag])
+  })
+  return quick_replyify(pairs)
+}
+
 function handleMessage(sender_psid, received_message) {
 
   let response, output, quick_replies;
 
   // Check if the message contains text
-  if (received_message.quick_reply && received_message.quick_reply.payload === 'add') {
-    let datum = spawnSync('datum', ['ls', 'tags'])
-    output = datum.stdout.toString().split('\n')
-    output.pop()
-    let pairs = []
-    output.forEach((tag) => {
-      pairs.push([tag, tag])
-    })
-    quick_replies = quick_replyify(pairs)
-    output = 'Input tag:'
-  } else if (received_message.quick_reply) {
-    let datum = spawnSync('datum', [received_message.quick_reply.payload])
-    output = datum.stdout.toString()
-    quick_replies = quick_replyify(datum_commands)
+  if(received_message.quick_reply) {
+    const user_selection = received_message.quick_reply.payload
+    switch (user_selection) {
+      case 'add':
+        output = 'Select tag to add:'
+        quick_replies = get_tag_quick_replies()
+        break
+      case 'rm':
+        break
+      case 'ls':
+        output = get_tag_quick_replies()
+        quick_replies = quick_replyify(datum_commands)
+        break
+      case '--help':
+        break
+      default:
+        output = 'hey now!'
+        quick_replies = quick_replyify(datum_commands)
+        break
+    }
   } else {
-    output = 'hey there!'
+    output = 'hey now!'
     quick_replies = quick_replyify(datum_commands)
   }
 
-
     // Create the payload for a basic text message
-    response = {
-      "text": output,
-      "quick_replies": quick_replies,
-    }
-
+  response = {
+    "text": output,
+    "quick_replies": quick_replies,
+  }
 
   // Sends the response message
-  callSendAPI(sender_psid, response);
+  callSendAPI(sender_psid, response)
 }
 
 // Imports dependencies and set up http server
