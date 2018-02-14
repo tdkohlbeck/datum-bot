@@ -62,10 +62,13 @@ const datum_commands = [
   ['help', '--help'],
 ]
 
-function get_tag_quick_replies() {
+function get_tag_quick_replies(list_only = false) {
   let datum = spawnSync('datum', ['ls', 'tags'])
-  let output = datum.stdout.toString().split('\n')
-  output.pop() // remove newline at the end
+  let output = datum.stdout.toString()
+  if (list_only) {
+    return output
+  }
+  output.split('\n').pop() // remove newline at the end
   let pairs = []
   output.forEach((tag) => {
     pairs.push([tag, tag])
@@ -88,7 +91,7 @@ function handleMessage(sender_psid, received_message) {
       case 'rm':
         break
       case 'ls':
-        output = get_tag_quick_replies()
+        output = get_tag_quick_replies(true)
         quick_replies = quick_replyify(datum_commands)
         break
       case '--help':
