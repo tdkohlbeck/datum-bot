@@ -16,19 +16,22 @@ function callSendAPI(sender_psid, response) {
     "message": response
   }
   // Send the HTTP request to the Messenger Platform
-  request({
-    "uri": "https://graph.facebook.com/v2.6/me/messages",
-    "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
-    "method": "POST",
-    "json": request_body
-  }, (err, res, body) => {
-    if (!err) {
-      console.log('message sent!')
-    } else {
-      console.error("Unable to send message:" + err)
-    }
-  })
-}
+  request(
+    {
+      "uri": "https://graph.facebook.com/v2.6/me/messages",
+      "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
+      "method": "POST",
+      "json": request_body
+    },
+    (err, res, body) => {
+      if (!err) {
+        console.log('message sent!')
+      } else {
+        console.error("Unable to send message:" + err)
+      }
+    } // lambda
+  ) // request call
+} // function def
 
 function quick_replyify(label_command_pairs) {
   let quick_replies = []
@@ -60,41 +63,39 @@ function get_tag_quick_replies(list_only = false) {
 
 function handleMessage(sender_psid, received_message) {
   let response, output, quick_replies
+
   const datum_commands = [
     ['add', 'add'],
     ['remove', 'rm'],
     ['list', 'ls'],
     ['help', '--help'],
   ]
-  if(received_message.quick_reply) {
-    const user_selection = received_message.quick_reply.payload
-    switch (user_selection) {
-      case 'add':
-        output = 'Select tag to add:'
-        quick_replies = get_tag_quick_replies()
-        break
-      case 'rm':
-        break
-      case 'ls':
-        output = get_tag_quick_replies(true)
-        quick_replies = quick_replyify(datum_commands)
-        break
-      case '--help':
-        break
-      default:
-        output = 'hey now!'
-        quick_replies = quick_replyify(datum_commands)
-        break
-    }
-  } else {
-    output = 'hey now!'
-    quick_replies = quick_replyify(datum_commands)
+
+  switch (received_message.quick_reply.payload) {
+    case 'add':
+      output = 'Select tag to add:'
+      quick_replies = get_tag_quick_replies()
+      break
+    case 'rm':
+      break
+    case 'ls':
+      output = get_tag_quick_replies(true)
+      quick_replies = quick_replyify(datum_commands)
+      break
+    case '--help':
+      break
+    default:
+      output = 'hey now!'
+      quick_replies = quick_replyify(datum_commands)
+      break
   }
-    // Create the payload for a basic text message
+
+  // Create the payload for a basic text message
   response = {
     "text": output,
     "quick_replies": quick_replies,
   }
+
   // Sends the response message
   callSendAPI(sender_psid, response)
 }
