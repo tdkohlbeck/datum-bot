@@ -1,0 +1,19 @@
+to further reduce friction [a] allow voice transcription
+datum bot needs to accept an easily spoken format
+this format must allow one to easily and understandably speak a series of tags, tag-value-pairs, and any number/combination/permutation e.g.
+breakfast, eggs: 2, orange juice: 1, toast
+we must recognize breaks between tags, tags with values, and multi-word tags ('orange juice')
+scratch:
+breakfast and eggs is two and orange juice is 1 and toast
+exercise and push ups is 20 and pull ups is 5 and wide push ups is 22
+exercise and push ups is 6
+i think i got it
+datum bot should parse the sentence, then convert it to the correct arguments for datum cli
+breakfast eggs:2 'orange juice':1 toast
+and -> space
+is -> colon
+tag with spaces -> underscore
+
+
+
+[a] the combination of two measures: 1) the time it takes to input a datum, from front pocket to database and 2) the effort expended navigating UIs
