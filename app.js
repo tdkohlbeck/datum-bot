@@ -7,31 +7,6 @@ const
   body_parser = require('body-parser'),
   app = express().use(body_parser.json())
 
-function callSendAPI(sender_psid, response) {
-  // Construct the message body
-  let request_body = {
-    "recipient": {
-      "id": sender_psid
-    },
-    "message": response
-  }
-  // Send the HTTP request to the Messenger Platform
-  request(
-    {
-      "uri": "https://graph.facebook.com/v2.6/me/messages",
-      "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
-      "method": "POST",
-      "json": request_body
-    },
-    (err, res, body) => {
-      if (!err) {
-        console.log('message sent!')
-      } else {
-        console.error("Unable to send message:" + err)
-      }
-    } // lambda
-  ) // request call
-} // function def
 
 function quick_replyify(label_command_pairs) {
   let quick_replies = []
@@ -61,6 +36,20 @@ function get_tag_quick_replies(list_only = false) {
   return quick_replyify(pairs)
 }
 
+function convert_message_to_datum_arg_list(message) {
+  let re_and = /(\s(and)\s)/gi
+  let re_is =  /(\s(is)\s)/gi
+  let re_space = /(?<!(is|and))\b\s\b(?!(is|and))/gi
+  // ^ only spaces in tag names
+
+  let datum_args = message
+    .replace(re_space, '_')
+    .replace(re_and, ' ')
+    .replace(re_is, ':')
+    .split(' ')
+  return datum_args
+}
+
 function handleMessage(sender_psid, received_message) {
   let response, output, quick_replies
 
@@ -71,7 +60,22 @@ function handleMessage(sender_psid, received_message) {
     ['help', '--help'],
   ]
 
-  switch (received_message.quick_reply.payload) {
+  let test_msg =
+    'food and drink and milk is 10 and orange juice is 5'
+
+  let selection
+  if (received_message.quick_reply) {
+    selection = received_message.quick_reply.payload
+  } else {
+    selection = convert_message_to_datum_arg_list(
+      received_message.text
+    )
+    console.log(received_message.text)
+    console.log(selection)
+    let datum = spawnSync('datum', ['add', selection] )
+    selection = datum.stdout.toString()
+  }
+  switch (selection) {
     case 'add':
       output = 'Select tag to add:'
       quick_replies = get_tag_quick_replies()
@@ -85,7 +89,7 @@ function handleMessage(sender_psid, received_message) {
     case '--help':
       break
     default:
-      output = 'hey now!'
+      output = selection
       quick_replies = quick_replyify(datum_commands)
       break
   }
@@ -99,6 +103,32 @@ function handleMessage(sender_psid, received_message) {
   // Sends the response message
   callSendAPI(sender_psid, response)
 }
+
+function callSendAPI(sender_psid, response) {
+  // Construct the message body
+  let request_body = {
+    "recipient": {
+      "id": sender_psid
+    },
+    "message": response
+  }
+  // Send the HTTP request to the Messenger Platform
+  request(
+    {
+      "uri": "https://graph.facebook.com/v2.6/me/messages",
+      "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
+      "method": "POST",
+      "json": request_body
+    },
+    (err, res, body) => {
+      if (!err) {
+        console.log('message sent!')
+      } else {
+        console.error("Unable to send message:" + err)
+      }
+    } // lambda
+  ) // request call
+} // function def
 
 // Sets server port and logs message on success
 app.listen(
@@ -117,7 +147,7 @@ app.post('/webhook', (req, res) => {
       // Get the webhook event. entry.messaging is an array, but
       // will only ever contain one event, so we get index 0
       let webhook_event = entry.messaging[0]
-      console.log(webhook_event)
+      // console.log(webhook_event)
       let sender_psid = webhook_event.sender.id
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
