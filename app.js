@@ -36,7 +36,7 @@ function get_tag_quick_replies(list_only = false) {
   return quick_replyify(pairs)
 }
 
-function convert_message_to_datum_arg_list(message) {
+function format_as_datum_args(message) {
   let re_and = /(\s(and)\s)/gi
   let re_is =  /(\s(is)\s)/gi
   let re_space = /(?<!(is|and))\b\s\b(?!(is|and))/gi
@@ -51,7 +51,7 @@ function convert_message_to_datum_arg_list(message) {
 }
 
 function handleMessage(sender_psid, received_message) {
-  let response, output, quick_replies
+  let output, quick_replies
 
   const datum_commands = [
     ['add', 'add'],
@@ -66,42 +66,43 @@ function handleMessage(sender_psid, received_message) {
   let selection
   if (received_message.quick_reply) {
     selection = received_message.quick_reply.payload
+  // if we are sent a sticker
+  } else if (received_message.sticker_id) {
+    selection = 'I don\'t understand stickers...'
   } else {
-    selection = convert_message_to_datum_arg_list(
+    selection = format_as_datum_args(
       received_message.text
     )
-    console.log(received_message.text)
-    console.log(selection)
-    let datum = spawnSync('datum', ['add', selection] )
+    let args = ['add'].concat(selection)
+    let datum = spawnSync('datum', args )
     selection = datum.stdout.toString()
   }
+
   switch (selection) {
     case 'add':
       output = 'Select tag to add:'
       quick_replies = get_tag_quick_replies()
       break
-    case 'rm':
-      break
     case 'ls':
       output = get_tag_quick_replies(true)
       quick_replies = quick_replyify(datum_commands)
       break
+    case 'rm':
     case '--help':
-      break
     default:
-      output = selection
+      output = selection || 'datum added'
       quick_replies = quick_replyify(datum_commands)
       break
   }
 
   // Create the payload for a basic text message
-  response = {
+  let response_message = {
     "text": output,
     "quick_replies": quick_replies,
   }
 
   // Sends the response message
-  callSendAPI(sender_psid, response)
+  callSendAPI(sender_psid, response_message)
 }
 
 function callSendAPI(sender_psid, response) {
