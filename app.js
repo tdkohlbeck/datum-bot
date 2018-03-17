@@ -40,12 +40,14 @@ function format_as_datum_args(message) {
   let re_and = /(\s(and)\s)/gi
   let re_is =  /(\s(is)\s)/gi
   let re_space = /(?<!(is|and))\b\s\b(?!(is|and))/gi
-  // ^ only spaces in tag names
+  // ^ only spaces in tag names (not with and/is)
 
   let datum_args = message
     .replace(re_space, '_')
     .replace(re_and, ' ')
     .replace(re_is, ':')
+    .replace('-', '_')
+    .toLowerCase()
     .split(' ')
   return datum_args
 }
