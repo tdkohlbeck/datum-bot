@@ -43,11 +43,11 @@ function format_as_datum_args(message) {
   // ^ only spaces in tag names (not with and/is)
 
   let datum_args = message
+    .toLowerCase()
     .replace(re_space, '_')
     .replace(re_and, ' ')
     .replace(re_is, ':')
     .replace('-', '_')
-    .toLowerCase()
     .split(' ')
   return datum_args
 }
