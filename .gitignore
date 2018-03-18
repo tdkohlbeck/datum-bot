@@ -2,3 +2,9 @@ node_modules/
 package-lock.json
 page-access-token.txt
 sync-config.json
+const config = {
+  twilio_account_sid: 'AC2cbb9d9d00b24f628f1b5114ebac6a9c',
+  twilio_auth_token: '890aad14d4638bb006284b5f29c37468',
+}
+
+export default config

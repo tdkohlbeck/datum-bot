@@ -5,8 +5,8 @@ const
   { spawnSync } = require('child_process'),
   express = require('express'),
   body_parser = require('body-parser'),
-  app = express().use(body_parser.json())
-
+  config = require('./config'),
+  app = express().use(body_parser.json()),
 
 function quick_replyify(label_command_pairs) {
   let quick_replies = []
@@ -119,7 +119,7 @@ function callSendAPI(sender_psid, response) {
   request(
     {
       "uri": "https://graph.facebook.com/v2.6/me/messages",
-      "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
+      "qs": { "access_token": config.fb_page_access_token },
       "method": "POST",
       "json": request_body
     },
