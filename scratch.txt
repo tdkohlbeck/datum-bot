@@ -17,3 +17,30 @@ tag with spaces -> underscore
 
 
 [a] the combination of two measures: 1) the time it takes to input a datum, from front pocket to database and 2) the effort expended navigating UIs
+
+DONE handle dashes
+TODO catch and convert fractions
+
+test_datum, long:list, ..., id:morning_pills
+
+datum add id:morning_pills
+datum add datum morning-pills (sugar)
+datum add datum 63
+or
+datum add 63 (?)
+datum add morning-pills (doesn't work)
+datum add _index:63
+datum add _id:morning-pills (datum data) (metadata) (metadatum)
+same value or same reference?
+id is value
+_ is reference (THAT datum)
+
+datum add id:morning_pills b6:500mg (add tag to the datum)
+datum add datum
+
+if you specify an identifier, name, number, etc.
+you can add a datum with just that id, and it will in essence
+be adding that same datum. id speaks for a datum
+a special tag
+
+TODO use rsync instead of syncjs
