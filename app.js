@@ -3,10 +3,9 @@
 const
   request = require('request'),
   { spawnSync } = require('child_process'),
-  express = require('express'),
   body_parser = require('body-parser'),
-  config = require('./config'),
-  app = express().use(body_parser.json())
+  app = require('express')().use(body_parser.json()),
+  config = require('./config')
 
 function quick_replyify(label_command_pairs) {
   let quick_replies = []
@@ -53,17 +52,12 @@ function format_as_datum_args(message) {
 }
 
 function handleMessage(sender_psid, received_message) {
-  let output, quick_replies
-
   const datum_commands = [
     ['add', 'add'],
     ['remove', 'rm'],
     ['list', 'ls'],
     ['help', '--help'],
   ]
-
-  let test_msg =
-    'food and drink and milk is 10 and orange juice is 5'
 
   let selection
   if (received_message.quick_reply) {
@@ -80,6 +74,7 @@ function handleMessage(sender_psid, received_message) {
     selection = datum.stdout.toString()
   }
 
+  let output, quick_replies
   switch (selection) {
     case 'add':
       output = 'Select tag to add:'
