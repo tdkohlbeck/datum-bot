@@ -6,7 +6,7 @@ const
   express = require('express'),
   body_parser = require('body-parser'),
   config = require('./config'),
-  app = express().use(body_parser.json()),
+  app = express().use(body_parser.json())
 
 function quick_replyify(label_command_pairs) {
   let quick_replies = []
