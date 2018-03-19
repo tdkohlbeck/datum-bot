@@ -1,7 +1,0 @@
-const config = {
-  twilio_account_sid: 'AC2cbb9d9d00b24f628f1b5114ebac6a9c',
-  twilio_auth_token: '890aad14d4638bb006284b5f29c37468',
-  fb_page_access_token: 'EAAFXEQpTodABACvOXu0IuQ3S0pRtfB2hsEmWWaqt0i6sZAmdbablQyfZCswYVenyB7wsovax8oFWBZB0ZBX0vmCGYwe4lXQfr2GBUMcmiYg4JSMPRx72gwtOjHeeuNk0oNZBM5oS5AVUCKpJ2K0084RcjfDrXOokMzRlCDTXyHQZDZD'
-}
-
-export default config
