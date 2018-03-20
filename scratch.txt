@@ -43,4 +43,4 @@ you can add a datum with just that id, and it will in essence
 be adding that same datum. id speaks for a datum
 a special tag
 
-TODO use rsync instead of syncjs
+DONE use rsync instead of syncjs

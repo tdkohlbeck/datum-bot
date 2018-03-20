@@ -5,7 +5,22 @@ const
   { spawnSync } = require('child_process'),
   body_parser = require('body-parser'),
   app = require('express')().use(body_parser.json()),
+  twilio = require('twilio'),
   config = require('./config')
+
+const client = new twilio(
+  config.twilio_account_sid,
+  config.twilio_auth_token,
+)
+
+client.messages.create({
+  body: 'eyy lmao',
+  to: '+14049557789',
+  from: '+18652344412',
+})
+.then(
+  (message) => console.log(message.sid)
+)
 
 function quick_replyify(label_command_pairs) {
   let quick_replies = []
