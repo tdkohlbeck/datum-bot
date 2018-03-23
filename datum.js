@@ -1,17 +1,5 @@
 'use strict'
 
-function quick_replyify(label_command_pairs) {
-  let quick_replies = []
-  label_command_pairs.forEach((pair) => {
-    quick_replies.push({
-      'content_type': 'text',
-      'title': pair[0],
-      'payload': pair[1],
-    })
-  })
-  return quick_replies
-}
-
 function get_tag_quick_replies(list_only = false) {
   let datum = spawnSync('datum', ['ls', 'tags'])
   let output = datum.stdout.toString()
@@ -45,7 +33,6 @@ function format_as_datum_args(message) {
 }
 
 module.exports = {
-  quick_replyify: quick_replyify,
   get_tag_quick_replies: get_tag_quick_replies,
   format_as_datum_args: format_as_datum_args,
 }

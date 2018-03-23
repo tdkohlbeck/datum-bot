@@ -19,7 +19,7 @@ app.post('/webhook', (req, res) => {
     let webhook_event = entry.messaging[0]
     let sender_psid = webhook_event.sender.id
     if (webhook_event.message) {
-      fb_bot.handleMessage(
+      fb_bot.handle_message(
         sender_psid,
         webhook_event.message
       )
