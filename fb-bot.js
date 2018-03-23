@@ -1,27 +1,24 @@
 'use strict'
+
 const
   { spawnSync } = require('child_process'),
   request = require('request')
-
-
 const {
   quick_replyify,
   get_tag_quick_replies,
   format_as_datum_args,
 } = require('./datum')
-
 const config = require('./config')
 
 
 function callSendAPI(sender_psid, response) {
-  // Construct the message body
   let request_body = {
     "recipient": {
       "id": sender_psid
     },
     "message": response
   }
-  // Send the HTTP request to the Messenger Platform
+
   request(
     {
       "uri": "https://graph.facebook.com/v2.6/me/messages",

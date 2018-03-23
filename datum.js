@@ -1,3 +1,5 @@
+'use strict'
+
 function quick_replyify(label_command_pairs) {
   let quick_replies = []
   label_command_pairs.forEach((pair) => {
