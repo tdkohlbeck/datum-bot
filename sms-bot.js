@@ -9,8 +9,8 @@ const client = new twilio(
 
 client.messages.create({
   body: 'eyy lmao',
-  to: '+14049557789',
-  from: '+18652344412',
+  to: config.my_number,
+  from: config.twilio_number,
 })
 .then(
   (message) => console.log(message.sid)

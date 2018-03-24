@@ -33,12 +33,12 @@ function call_send_api(
     'message': response,
   }
   const request_object = {
-    'uri': "https://graph.facebook.com/v2.6/me/messages",
+    'uri': 'https://graph.facebook.com/v2.6/me/messages',
     'qs': {
-      'access_token': config.fb_page_access_token
+      'access_token': config.fb_page_access_token,
     },
     'method': 'POST',
-    'json': request_body
+    'json': request_body,
   }
   const handle_response = (err, res, body) => {
     if (err) {
@@ -63,7 +63,6 @@ function handle_message(
     ['list',   'ls'    ],
     ['help',   '--help'],
   ]
-
   let selection
   if (received_message.quick_reply) {
     selection = received_message.quick_reply.payload
@@ -75,7 +74,6 @@ function handle_message(
     const datum = spawnSync('datum', arg_list)
     selection = datum.stdout.toString()
   }
-
   let output, quick_replies
   switch (selection) {
     case 'add':
@@ -93,12 +91,10 @@ function handle_message(
       quick_replies = quick_replyify(datum_commands)
       break
   }
-
   const response_message = {
     'text': output,
     'quick_replies': quick_replies,
   }
-
   call_send_api(
     sender_psid,
     response_message

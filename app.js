@@ -3,18 +3,26 @@
 const
   body_parser = require('body-parser'),
   app = require('express')().use(body_parser.json()),
-  request = require('request')
+  request = require('request'),
+  twilio = require('twilio')
 const
   fb_bot = require('./fb-bot'),
   //sms_bot = require('./sms-bot'),
   config = require('./config')
+
+app.post('/sms', (req, res) => {
+  const MessagingResponse = twilio.twiml.MessagingResponse
+  const twiml = new MessaginjgResponse()
+  twiml.message('twiml webhook!')
+  res.writeHead(200, {'Content-Type': 'text/xml'})
+  res.end(twiml.toString())
+})
 
 app.post('/webhook', (req, res) => {
   if (req.body.object !== 'page') {
     res.sendStatus(403)
     return
   }
-
   req.body.entry.forEach( (entry) => {
     let webhook_event = entry.messaging[0]
     let sender_psid = webhook_event.sender.id
@@ -35,7 +43,6 @@ app.get('/webhook', (req, res) => {
     res.sendStatus(403)
     return
   }
-
   const
     VERIFY_TOKEN = config.fb_page_access_token
     mode = req.query['hub.mode']
