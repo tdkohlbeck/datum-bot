@@ -3,11 +3,9 @@
 const
   { spawnSync } = require('child_process'),
   request = require('request')
-const {
-  get_tag_quick_replies,
-  format_as_datum_args,
-} = require('./datum')
-const config = require('./config')
+const
+  datum = require('./datum'),
+  config = require('./config')
 
 function quick_replyify(label_command_pairs) {
   let quick_replies = []
@@ -69,19 +67,19 @@ function handle_message(
   } else if (received_message.sticker_id) {
     selection = 'I don\'t understand stickers...'
   } else {
-    const args = format_as_datum_args(received_message.text)
-    const arg_list = ['add'].concat(args)
-    const datum = spawnSync('datum', arg_list)
-    selection = datum.stdout.toString()
+    const args = datum.format_as_datum_args(
+      received_message.text
+    )
+    datum.add(args)
   }
   let output, quick_replies
   switch (selection) {
     case 'add':
       output = 'Select tag to add:'
-      quick_replies = get_tag_quick_replies()
+      quick_replies = datum.get_tag_quick_replies()
       break
     case 'ls':
-      output = get_tag_quick_replies(true)
+      output = datum.get_tag_quick_replies(true)
       quick_replies = quick_replyify(datum_commands)
       break
     case 'rm':

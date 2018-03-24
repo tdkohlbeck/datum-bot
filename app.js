@@ -8,16 +8,19 @@ const
 const
   fb_bot = require('./fb-bot'),
   //sms_bot = require('./sms-bot'),
+  datum = require('./datum'),
   config = require('./config')
 
 const app = express()
 app
   .use(express.static(__dirname + '/public'))
-  .use(body_parser.json())
+  .use(body_parser.json()) // for fb?
+  .use(body_parser.urlencoded({extended: false})) // for sms
 
 app.post('/sms', (req, res) => {
   const MessagingResponse = twilio.twiml.MessagingResponse
-  const twiml = new MessaginjgResponse()
+  const twiml = new MessagingResponse()
+  datum.add(datum.format_as_datum_args(req.body.Body))
   twiml.message('twiml webhook!')
   res.writeHead(200, {'Content-Type': 'text/xml'})
   res.end(twiml.toString())
