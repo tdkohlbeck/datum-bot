@@ -2,13 +2,18 @@
 
 const
   body_parser = require('body-parser'),
-  app = require('express')().use(body_parser.json()),
+  express = require('express'),
   request = require('request'),
   twilio = require('twilio')
 const
   fb_bot = require('./fb-bot'),
   //sms_bot = require('./sms-bot'),
   config = require('./config')
+
+const app = express()
+app
+  .use(express.static(__dirname + '/public'))
+  .use(body_parser.json())
 
 app.post('/sms', (req, res) => {
   const MessagingResponse = twilio.twiml.MessagingResponse
