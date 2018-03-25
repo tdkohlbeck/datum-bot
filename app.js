@@ -20,8 +20,8 @@ app
 app.post('/sms', (req, res) => {
   const MessagingResponse = twilio.twiml.MessagingResponse
   const twiml = new MessagingResponse()
-  datum.add(datum.format_as_datum_args(req.body.Body))
-  twiml.message('twiml webhook!')
+  const datum_output = datum.add_msg(req.body.Body)
+  twiml.message(datum_output)
   res.writeHead(200, {'Content-Type': 'text/xml'})
   res.end(twiml.toString())
 })

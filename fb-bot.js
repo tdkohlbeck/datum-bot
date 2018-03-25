@@ -20,6 +20,21 @@ function quick_replyify(label_command_pairs) {
   return quick_replies
 }
 
+function get_tag_quick_replies(list_only = false) {
+  let datum = spawn('datum', ['ls', 'tags'])
+  let output = datum.stdout.toString()
+  if (list_only) {
+    return output
+  }
+  output = output.split('\n')
+  output.pop() // remove newline at the end
+  let pairs = []
+  output.forEach((tag) => {
+    pairs.push([tag, tag])
+  })
+  return quick_replyify(pairs)
+}
+
 function call_send_api(
   sender_psid,
   response
@@ -67,19 +82,16 @@ function handle_message(
   } else if (received_message.sticker_id) {
     selection = 'I don\'t understand stickers...'
   } else {
-    const args = datum.format_as_datum_args(
-      received_message.text
-    )
-    datum.add(args)
+    datum.add_msg(received_message.text)
   }
   let output, quick_replies
   switch (selection) {
     case 'add':
       output = 'Select tag to add:'
-      quick_replies = datum.get_tag_quick_replies()
+      quick_replies = get_tag_quick_replies()
       break
     case 'ls':
-      output = datum.get_tag_quick_replies(true)
+      output = get_tag_quick_replies(true)
       quick_replies = quick_replyify(datum_commands)
       break
     case 'rm':
