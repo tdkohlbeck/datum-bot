@@ -44,3 +44,11 @@ be adding that same datum. id speaks for a datum
 a special tag
 
 DONE use rsync instead of syncjs
+TODO switch spawn to exec (double check explanations)
+TODO twilio response
+TODO split code into
+  server (express)
+  travisk.com
+  datum-js
+  twilio
+  fb-bot

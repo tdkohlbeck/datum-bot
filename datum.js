@@ -30,4 +30,5 @@ function add_msg(spoken_msg) {
 
 module.exports = {
   add_msg,
+  run,
 }

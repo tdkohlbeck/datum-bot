@@ -21,8 +21,7 @@ function quick_replyify(label_command_pairs) {
 }
 
 function get_tag_quick_replies(list_only = false) {
-  let datum = spawn('datum', ['ls', 'tags'])
-  let output = datum.stdout.toString()
+  const output = datum.run('ls', 'tags')
   if (list_only) {
     return output
   }
@@ -111,6 +110,44 @@ function handle_message(
   )
 }
 
+function handle_post_request(req, res) {
+  if (req.body.object !== 'page') {
+    res.sendStatus(403)
+    return
+  }
+  req.body.entry.forEach( entry => {
+    let webhook_event = entry.messaging[0]
+    let sender_psid = webhook_event.sender.id
+    if (webhook_event.message) {
+      handle_message(
+        sender_psid,
+        webhook_event.message
+      )
+    } else if (webhook_event.postback) {
+      handlePostback(sender_psid, webhook_event.postback)
+    }
+    res.status(200).send('EVENT_RECEIVED\n')
+  })
+}
+
+function handle_get_request(req, res) {
+  if (!mode && !token) {
+    res.sendStatus(403)
+    return
+  }
+  const
+    VERIFY_TOKEN = config.fb_page_access_token,
+    mode = req.query['hub.mode'],
+    token = req.query['hub.verify_token'],
+    challenge = req.query['hub.challenge']
+
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    console.log('WEBHOOK_VERIFIED')
+    res.status(200).send(challenge)
+  }
+}
+
 module.exports = {
-  handle_message: handle_message,
+  handle_post_request,
+  handle_get_request,
 }
