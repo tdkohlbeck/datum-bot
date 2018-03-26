@@ -57,7 +57,6 @@ function call_send_api(
       console.log('facebook cannot send message')
       return
     }
-    console.log('message sent')
   }
   request(
     request_object,
@@ -119,6 +118,10 @@ function handle_post_request(req, res) {
     let webhook_event = entry.messaging[0]
     let sender_psid = webhook_event.sender.id
     if (webhook_event.message) {
+      console.log(
+        'received fb msg:',
+        webhook_event.message.text,
+      )
       handle_message(
         sender_psid,
         webhook_event.message
