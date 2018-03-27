@@ -20,12 +20,9 @@ function convert_to_military_time(random_time) {
     const correct_minutes = Math.floor(
       random_gaussian(2) * 60
     )
-    // TODO remove
-    random_time = Math.floor(
-      random_time
+    random_time = random_time
       - last_two_numbers(random_time)
       + correct_minutes
-    )
   }
   return random_time
 }
@@ -34,8 +31,7 @@ module.exports = function get_random_times(
   count = 3,
   begin_time = 900,
   end_time = 2100,
-) {
-
+){
   const
     available_hours = end_time - begin_time, // e.g. 1200
     interval = Math.floor(available_hours / count) // e.g. 400
@@ -43,11 +39,9 @@ module.exports = function get_random_times(
   for (let i = 0; i < count; i++) {
     const interval_begin_time = begin_time + i * interval
     const random_interval = Math.floor(interval * random_gaussian(2))
-    random_times.push(
-      convert_to_military_time(
-        interval_begin_time + random_interval
-      )
-    )
+    random_times.push(convert_to_military_time(
+      interval_begin_time + random_interval
+    ))
   }
   return random_times
 }

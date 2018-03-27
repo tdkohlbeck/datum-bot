@@ -16,27 +16,31 @@ function send_status_update_msg() {
     body: 'Time for a status update! How you feelin\'?',
     to: config.my_number,
     from: config.twilio_number,
-  }).then( message => console.log(message.sid) )
+  }).then(() => console.log('reminder sent at', Date.now))
 }
 
+function hhmm_now() {
+  const now = new Date()
+  return now.getHours() * 100 + now.getMinutes()
+}
 
-
-
-const random_times = get_random_times(
-  3,
-  2341,
-  2351,
-)
+const random_times = get_random_times(3, 900, 2100)
 console.log(random_times)
-const interval_id = setInterval(() => {
-  const
-    now = new Date(),
-    military_now = now.getHours() * 100 + now.getSeconds()
-  if (random_times.includes(military_now)) {
+let last_time_message_sent
+const less_than_a_minute = 1000
+setInterval(() => {
+  const now = hhmm_now()
+  if (
+    random_times.includes(now)
+    && now != last_time_message_sent
+  ){
+    console.log('MATCH AT', now)
+    last_time_message_sent = now
     send_status_update_msg()
   }
-  console.log(military_now)
-}, 900)
+}, less_than_a_minute)
+// ^ stave off interval drift from missing a minute
+// (small chance of missed minute if drift >= 60,001)
 
 
 function handle_post_request(req, res) {
