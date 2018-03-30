@@ -25,7 +25,8 @@ function run(cmd, argv) {
 
 function add_msg(spoken_msg) {
   const tags = format_as_datum_args(spoken_msg)
-  return run('add', tags)
+  run('add', tags)
+  return tags
 }
 
 module.exports = {

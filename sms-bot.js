@@ -38,17 +38,20 @@ setInterval(() => {
     last_time_message_sent = now
     send_status_update_msg()
   }
+  if (now === 0000) // dawn of the second day
+    random_times = get_random_times(3, 900, 2100)
 }, less_than_a_minute)
 // ^ stave off interval drift from missing a minute
 // (small chance of missed minute if drift >= 60,001)
 
 
 function handle_post_request(req, res) {
-  console.log('received sms:', req.body.Body)
+  console.log('received sms:\n', req.body.Body)
   const
     MessagingResponse = twilio.twiml.MessagingResponse,
     twiml = new MessagingResponse(),
     datum_output = datum.add_msg(req.body.Body)
+  console.log('datum added:\n', datum_output)
   twiml.message(datum_output)
   res.writeHead(200, {'Content-Type': 'text/xml'})
   res.end(twiml.toString())
