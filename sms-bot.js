@@ -38,7 +38,7 @@ setInterval(() => {
     last_time_message_sent = now
     send_status_update_msg()
   }
-  if (now === 0000) // dawn of the second day
+  if (now === parseInt('0000')) // dawn of the second day
     random_times = get_random_times(3, 900, 2100)
 }, less_than_a_minute)
 // ^ stave off interval drift from missing a minute
