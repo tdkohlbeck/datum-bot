@@ -24,7 +24,7 @@ function hhmm_now() {
   return now.getHours() * 100 + now.getMinutes()
 }
 
-const random_times = get_random_times(3, 900, 2100)
+let random_times = get_random_times(3, 900, 2100)
 console.log(random_times)
 let last_time_message_sent
 const less_than_a_minute = 1000
