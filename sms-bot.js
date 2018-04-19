@@ -16,7 +16,7 @@ function send_status_update_msg() {
     body: 'Time for a status update! How you feelin\'?',
     to: config.my_number,
     from: config.twilio_number,
-  }).then(() => console.log('reminder sent at', Date.now))
+  }).then(() => console.log('reminder sent at', hhmm_now()))
 }
 
 function hhmm_now() {
@@ -24,22 +24,43 @@ function hhmm_now() {
   return now.getHours() * 100 + now.getMinutes()
 }
 
+function send_reminder(reminder) {
+  client.messages.create({
+    body: reminder,
+    to: config.my_number,
+    from: config.twilio_number,
+  }).then(() => console.log('reminder sent at', hhmm_now()))
+}
+
+const less_than_a_minute = 1000
+
+let reminders = datum.run('ls', ['stop'])
+send_reminder(reminders)
+
+setInterval(() => {
+  /*reminders.map( reminder => {
+    if( reminder.datetime === yymmddhhmm_now())
+      send_reminder(reminder.message)
+  })*/
+}, less_than_a_minute)
+
 let random_times = get_random_times(3, 900, 2100)
 console.log(random_times)
 let last_time_message_sent
-const less_than_a_minute = 1000
+
 setInterval(() => {
-  const now = hhmm_now()
+  if (!random_times || hhmm_now() === parseInt('0000')) { // dawn of the second day
+    random_times = get_random_times(3, 900, 2100)
+    console.log(random_times)
+  }
   if (
-    random_times.includes(now)
-    && now != last_time_message_sent
+    random_times.includes(hhmm_now())
+    && hhmm_now() != last_time_message_sent
   ){
-    console.log('MATCH AT', now)
-    last_time_message_sent = now
+    console.log('random status update reminder at', hhmm_now())
+    last_time_message_sent = hhmm_now()
     send_status_update_msg()
   }
-  if (now === parseInt('0000')) // dawn of the second day
-    random_times = get_random_times(3, 900, 2100)
 }, less_than_a_minute)
 // ^ stave off interval drift from missing a minute
 // (small chance of missed minute if drift >= 60,001)

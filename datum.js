@@ -1,6 +1,7 @@
 'use strict'
 
-const spawn = require('child_process').spawn
+const execFile = require('child_process').execFileSync
+const readline = require('readline')
 
 
 function format_as_datum_args(spoken_msg) {
@@ -19,8 +20,8 @@ function format_as_datum_args(spoken_msg) {
 }
 
 function run(cmd, argv) {
-  const datum = spawn('datum', [cmd].concat(argv))
-  return datum.stdout.toString()
+  let output = execFile('datum', [cmd].concat(argv))
+  return output.toString()
 }
 
 function add_msg(spoken_msg) {
