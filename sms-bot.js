@@ -1,6 +1,7 @@
 'use strict'
 
 const twilio = require('twilio')
+const chrono = require('chrono-node')
 const
   datum = require('./datum'),
   config = require('./config'),
@@ -24,6 +25,30 @@ function hhmm_now() {
   return now.getHours() * 100 + now.getMinutes()
 }
 
+function hhmm_of(datetime) {
+  const date = new Date(datetime)
+  return date.getHours() * 100 + date.getMinutes()
+}
+
+function yyyymmdd_now() {
+  const now = new Date()
+  return now.getFullYear() * 1e4
+    + (now.getMonth() + 1) * 100
+    + now.getDate()
+}
+
+function yyyymmdd_of(datetime) {
+  const date = new Date(datetime)
+  return date.getFullYear() * 1e4
+    + (date.getMonth() + 1) * 100
+    + date.getDate()
+}
+
+function parsed_reminder_time(time_string) {
+  time_string = new Date(chrono.parseDate(time_string))
+  return time_string.toLocaleString()
+}
+
 function send_reminder(reminder) {
   client.messages.create({
     body: reminder,
@@ -32,16 +57,38 @@ function send_reminder(reminder) {
   }).then(() => console.log('reminder sent at', hhmm_now()))
 }
 
-const less_than_a_minute = 1000
+const less_than_a_minute = 30000 // ms
 
-let reminders = datum.run('ls', ['stop'])
-send_reminder(reminders)
+const reminder_datums = JSON.parse(
+  datum.run('--json', ['ls', 'reminder'])
+)
 
+let reminders = reminder_datums.map(datum => {
+  return {
+    message: datum.reminder,
+    date: yyyymmdd_of(parsed_reminder_time(datum.time)),
+    time: hhmm_of(parsed_reminder_time(datum.time)),
+  }
+})
+
+// TODO add reminder upon receiving text
+let last_time_reminder_sent
 setInterval(() => {
-  /*reminders.map( reminder => {
-    if( reminder.datetime === yymmddhhmm_now())
+  reminders.map( reminder => {
+    if(
+      reminder.date === yyyymmdd_now()
+      && reminder.time === hhmm_now()
+      && hhmm_now() != last_time_reminder_sent
+    ){
       send_reminder(reminder.message)
-  })*/
+      console.log(
+        'reminder',
+        '\"' + reminder.message + '\"',
+        'sent at', hhmm_now()
+      )
+      last_time_reminder_sent = hhmm_now()
+    }
+  })
 }, less_than_a_minute)
 
 let random_times = get_random_times(3, 900, 2100)
