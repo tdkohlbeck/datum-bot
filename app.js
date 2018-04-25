@@ -13,8 +13,8 @@ app
   .use(body_parser.json()) // for fb?
   .use(body_parser.urlencoded({extended: false})) // for sms
 
-app.get('/webhook', fb_bot.handle_get_request)
-app.post('/webhook', fb_bot.handle_post_request)
+//app.get('/webhook', fb_bot.handle_get_request)
+//app.post('/webhook', fb_bot.handle_post_request)
 
 app.post('/sms', sms_bot.handle_post_request)
 

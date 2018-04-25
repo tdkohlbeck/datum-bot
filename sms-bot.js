@@ -17,7 +17,7 @@ function send_status_update_msg() {
     body: 'Time for a status update! How you feelin\'?',
     to: config.my_number,
     from: config.twilio_number,
-  }).then(() => console.log('reminder sent at', hhmm_now()))
+  }).then(() => console.log('status request sent at', hhmm_now()))
 }
 
 function hhmm_now() {
@@ -45,6 +45,7 @@ function yyyymmdd_of(datetime) {
 }
 
 function parsed_reminder_time(time_string) {
+  time_string = time_string.replace(/_/g, ' ')
   time_string = new Date(chrono.parseDate(time_string))
   return time_string.toLocaleString()
 }
@@ -57,23 +58,28 @@ function send_reminder(reminder) {
   }).then(() => console.log('reminder sent at', hhmm_now()))
 }
 
-const less_than_a_minute = 30000 // ms
+function get_reminders() {
+  const reminder_datums = JSON.parse(
+    datum.run('--json', ['ls', 'reminder'])
+  )
+  let reminders = reminder_datums.map(datum => {
+    if (!datum.time) return
 
-const reminder_datums = JSON.parse(
-  datum.run('--json', ['ls', 'reminder'])
-)
-
-let reminders = reminder_datums.map(datum => {
-  return {
-    message: datum.reminder,
-    date: yyyymmdd_of(parsed_reminder_time(datum.time)),
-    time: hhmm_of(parsed_reminder_time(datum.time)),
-  }
-})
+    return {
+      message: datum.reminder.replace(/_/g, ' '),
+      date: yyyymmdd_of(parsed_reminder_time(datum.time)),
+      time: hhmm_of(parsed_reminder_time(datum.time)),
+    }
+  })
+  return reminders
+}
 
 // TODO add reminder upon receiving text
+const less_than_a_minute = 1000 // ms
 let last_time_reminder_sent
+let reminders = get_reminders()
 setInterval(() => {
+  if (!reminders.length) return
   reminders.map( reminder => {
     if(
       reminder.date === yyyymmdd_now()
@@ -81,11 +87,6 @@ setInterval(() => {
       && hhmm_now() != last_time_reminder_sent
     ){
       send_reminder(reminder.message)
-      console.log(
-        'reminder',
-        '\"' + reminder.message + '\"',
-        'sent at', hhmm_now()
-      )
       last_time_reminder_sent = hhmm_now()
     }
   })
@@ -104,13 +105,12 @@ setInterval(() => {
     random_times.includes(hhmm_now())
     && hhmm_now() != last_time_message_sent
   ){
-    console.log('random status update reminder at', hhmm_now())
     last_time_message_sent = hhmm_now()
     send_status_update_msg()
   }
 }, less_than_a_minute)
 // ^ stave off interval drift from missing a minute
-// (small chance of missed minute if drift >= 60,001)
+// (small chance of missed minute if timer drifts > 60,000)
 
 
 function handle_post_request(req, res) {
@@ -119,7 +119,11 @@ function handle_post_request(req, res) {
     MessagingResponse = twilio.twiml.MessagingResponse,
     twiml = new MessagingResponse(),
     datum_output = datum.add_msg(req.body.Body)
-  console.log('datum added:\n', datum_output)
+  console.log('datum added:\n', datum.format_as_datum_args(req.body.Body))
+  if (req.body.Body.toLowerCase().includes('reminder')) {
+    console.log('new reminder added')
+    reminders = get_reminders()
+  }
   twiml.message(datum_output)
   res.writeHead(200, {'Content-Type': 'text/xml'})
   res.end(twiml.toString())

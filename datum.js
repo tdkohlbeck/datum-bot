@@ -1,8 +1,6 @@
 'use strict'
 
 const execFile = require('child_process').execFileSync
-const readline = require('readline')
-
 
 function format_as_datum_args(spoken_msg) {
   const
@@ -26,11 +24,12 @@ function run(cmd, argv) {
 
 function add_msg(spoken_msg) {
   const tags = format_as_datum_args(spoken_msg)
-  run('add', tags)
-  return tags
+  return run('add', tags)
+
 }
 
 module.exports = {
   add_msg,
+  format_as_datum_args,
   run,
 }
